@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Card, Col, Input, InputNumber, Popover, Row, Select, Switch} from "antd";
+import {Button, Card, Col, Input, InputNumber, Popover, Row, Select, Switch, Tree} from "antd";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as StorageProviderBackend from "./backend/StorageProviderBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
@@ -28,6 +28,112 @@ import {Controlled as CodeMirror} from "react-codemirror2";
 
 const {Option} = Select;
 const {TextArea} = Input;
+
+export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck}) => {
+  const NavItemNodes = [
+    {
+      title: i18next.t("store:All"),
+      key: "all",
+      children: [
+        {
+          title: i18next.t("general:Home"),
+          key: "/home-top",
+          children: [
+            {title: i18next.t("general:Chat"), key: "/chat"},
+            {title: i18next.t("general:Usages"), key: "/usages"},
+            {title: i18next.t("general:Activities"), key: "/activities"},
+            {title: i18next.t("general:OS Desktop"), key: "/desktop"},
+          ],
+        },
+        {
+          title: i18next.t("general:Chats & Messages"),
+          key: "/ai-chat",
+          children: [
+            {title: i18next.t("general:Chats"), key: "/chats"},
+            {title: i18next.t("general:Messages"), key: "/messages"},
+          ],
+        },
+        {
+          title: i18next.t("general:AI Setting"),
+          key: "/ai-setting",
+          children: [
+            {title: i18next.t("general:Stores"), key: "/stores"},
+            {title: i18next.t("general:Providers"), key: "/providers"},
+            {title: i18next.t("general:Vectors"), key: "/vectors"},
+          ],
+        },
+        {
+          title: i18next.t("general:Cloud Resources"),
+          key: "/cloud",
+          children: [
+            {title: i18next.t("general:Templates"), key: "/templates"},
+            {title: i18next.t("general:Application Store"), key: "/application-store"},
+            {title: i18next.t("general:Applications"), key: "/applications"},
+            {title: i18next.t("general:Nodes"), key: "/nodes"},
+            {title: i18next.t("general:Machines"), key: "/machines"},
+            {title: i18next.t("general:Images"), key: "/images"},
+            {title: i18next.t("general:Containers"), key: "/containers"},
+            {title: i18next.t("general:Pods"), key: "/pods"},
+            {title: i18next.t("general:Workbench"), key: "/workbench"},
+          ],
+        },
+        {
+          title: i18next.t("general:Multimedia"),
+          key: "/multimedia",
+          children: [
+            {title: i18next.t("general:Videos"), key: "/videos"},
+            {title: i18next.t("general:Public Videos"), key: "/public-videos"},
+            {title: i18next.t("general:Tasks"), key: "/tasks"},
+            {title: i18next.t("general:Forms"), key: "/forms"},
+            {title: i18next.t("general:Workflows"), key: "/workflows"},
+            {title: i18next.t("general:Audit"), key: "/audit"},
+            {title: i18next.t("med:Medical Image Analysis"), key: "/yolov8mi"},
+            {title: i18next.t("med:Super Resolution"), key: "/sr"},
+            {title: i18next.t("general:Articles"), key: "/articles"},
+            {title: i18next.t("general:Graphs"), key: "/graphs"},
+          ],
+        },
+        {
+          title: i18next.t("general:Logging & Auditing"),
+          key: "/logs",
+          children: [
+            {title: i18next.t("general:Sessions"), key: "/sessions"},
+            {title: i18next.t("general:Connections"), key: "/connections"},
+            {title: i18next.t("general:Records"), key: "/records"},
+          ],
+        },
+        {
+          title: i18next.t("general:Identity & Access Management"),
+          key: "/identity",
+          children: [
+            {title: i18next.t("general:Users"), key: "/users"},
+            {title: i18next.t("general:Resources"), key: "/resources"},
+            {title: i18next.t("general:Permissions"), key: "/permissions"},
+          ],
+        },
+        {
+          title: i18next.t("general:Admin"),
+          key: "/admin",
+          children: [
+            {title: i18next.t("general:System Info"), key: "/sysinfo"},
+            {title: i18next.t("general:Swagger"), key: "/swagger"},
+          ],
+        },
+      ],
+    },
+  ];
+
+  return (
+    <Tree
+      disabled={disabled}
+      checkable
+      checkedKeys={checkedKeys}
+      defaultExpandedKeys={defaultExpandedKeys}
+      onCheck={onCheck}
+      treeData={NavItemNodes}
+    />
+  );
+};
 
 class StoreEditPage extends React.Component {
   constructor(props) {
@@ -514,6 +620,21 @@ class StoreEditPage extends React.Component {
                 <input type="color" value={this.state.store.themeColor} onChange={(e) => {
                   this.updateStoreField("themeColor", e.target.value);
                 }} />
+              </Col>
+            </Row>
+            <Row style={{marginTop: "20px"}} >
+              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                {Setting.getLabel(i18next.t("store:Navbar items"), i18next.t("store:Navbar items - Tooltip"))} :
+              </Col>
+              <Col span={22} >
+                <NavItemTree
+                  disabled={!Setting.isAdminUser(this.props.account)}
+                  checkedKeys={this.state.store.navItems ?? ["all"]}
+                  defaultExpandedKeys={["all"]}
+                  onCheck={(checked) => {
+                    this.updateStoreField("navItems", checked);
+                  }}
+                />
               </Col>
             </Row>
             <Row style={{marginTop: "20px"}} >
